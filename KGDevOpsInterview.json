@@ -1,0 +1,17 @@
+{
+    "AWSTemplateFormatVersion" : "2010-09-09",
+
+    "Description": "KG DevOps interview CF stack"
+
+    "Resources": {
+
+        "InterviewEC2Instance": {
+            "Type: "AWS::EC2::Instance",
+            "Properties": {
+                "InstanceType": "t2.nano",
+                "ImageId": "ami-047bb4163c506cd98",
+                "SourceDestCheck" : "false"
+            }
+        }
+    }
+}
