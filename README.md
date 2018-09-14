@@ -33,9 +33,11 @@ You should then modify your script to just print out the beer name (the name fie
 
 The start of the output should look something like the below, yours may differ slightly, that's OK:
 
+```sh
 Buzz,4.5
 Pilsen Lager,6.3
 Electric India,5.2
+```
 
 Bonus section
 
