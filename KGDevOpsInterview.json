@@ -1,17 +1,83 @@
 {
     "AWSTemplateFormatVersion" : "2010-09-09",
 
-    "Description": "KG DevOps interview CF stack"
+    "Description": "KG DevOps interview CF stack",
 
     "Resources": {
 
         "InterviewEC2Instance": {
-            "Type: "AWS::EC2::Instance",
+            "Type": "AWS::EC2::Instance",
             "Properties": {
-                "InstanceType": "t2.nano",
-                "ImageId": "ami-047bb4163c506cd98",
-                "SourceDestCheck" : "false"
+                "InstanceType": "t2.micro",
+                "ImageId": "ami-01a76e79ae757048d",
+                "SourceDestCheck" : "false",
+                "Tags":[{"Key":"Name","Value":"Flavio Ceccarelli"}],
+                "KeyName":"SysOps",
+                "UserData": {
+                    "Fn::Base64": "#!/bin/bash -xe\nyum update -y \nyum install python36 -y\ncurl -O https://bootstrap.pypa.io/get-pip.py \npython3 get-pip.py \n/usr/local/bin/pip install awscli\n"
+                }
             }
+            
+        },
+        "InterviewSecurityGroup":{
+            "Type":"AWS::EC2::SecurityGroup",
+            "Properties":{
+                "GroupDescription":"Security Group needed to grant access HTTP access on port 80 to load balancer",
+                "GroupName":"InterviewALBSecurityGroup",
+                "SecurityGroupIngress":{
+                    "IpProtocol":"tcp",
+                    "FromPort":80,
+                    "ToPort":80,
+                    "CidrIp": "0.0.0.0/0"
+                }
+            }
+
+        },
+        "InterviewAlbTargetGroup":{
+            "Type": "AWS::ElasticLoadBalancingV2::TargetGroup",
+            "Properties":{
+                "Name": "InterviewAlbTargetGroup",
+                "TargetType":"instance",
+                "Protocol":"HTTP",
+                "Port":80,
+                "Targets":[{
+                    "Id": {"Ref":"InterviewEC2Instance"},
+                    "Port" : 80
+                }],
+                "VpcId":"vpc-cd6ef7a5"
+            }
+        },
+        "InterviewALB":{
+            "Type":"AWS::ElasticLoadBalancingV2::LoadBalancer",
+            "Properties":{
+                "Type":"application",
+                "SecurityGroups":[{"Fn::GetAtt" :["InterviewSecurityGroup", "GroupId"]  }],
+                "Subnets":["subnet-5888eb31","subnet-8344b6cf","subnet-ef943b95"]
+            },
+            "DependsOn":"InterviewSecurityGroup"
+        },
+        "InterviewALBListener":{
+            "Type" : "AWS::ElasticLoadBalancingV2::Listener",
+            "Properties" : {
+                "DefaultActions" : [{
+                    "TargetGroupArn" : {"Ref":"InterviewAlbTargetGroup"},
+                    "Type" : "forward"
+                    }],
+                "LoadBalancerArn" : {"Ref":"InterviewALB"},
+                "Port" : 80,
+                "Protocol" : "HTTP"
+                
+              }
+        }  
+
+    },
+
+    "Outputs":{
+        "InterviewEC2InstanceOutput":{
+            "Description":"The Interview ec2 instance",
+            "Value": {"Ref" : "InterviewEC2Instance"},
+            "Export": {"Name":"InterviewEC2InstanceOutput", "Id":{"Ref" : "InterviewEC2Instance"}}
+
         }
     }
 }
