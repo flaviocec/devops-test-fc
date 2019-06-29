@@ -13,8 +13,17 @@
                 "SourceDestCheck" : "false",
                 "Tags":[{"Key":"Name","Value":"Flavio Ceccarelli"}],
                 "KeyName":"SysOps",
+                "IamInstanceProfile":{"Fn::ImportValue":"InterviewSQSInstanceProfileOutput"},
                 "UserData": {
-                    "Fn::Base64": "#!/bin/bash -xe\nyum update -y \nyum install python36 -y\ncurl -O https://bootstrap.pypa.io/get-pip.py \npython3 get-pip.py \n/usr/local/bin/pip install awscli\n"
+                    "Fn::Base64": {"Fn::Join":["",[
+                        "#!/bin/bash\n",
+                        "yum update -y\n",
+                        "yum install -y python36\n",
+                        "curl -O https://bootstrap.pypa.io/get-pip.py\n",
+                        "python3 get-pip.py\n",
+                        "/usr/local/bin/pip install awscli"
+                    ]]}
+                    
                 }
             }
             

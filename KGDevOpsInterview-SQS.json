@@ -46,5 +46,13 @@
                "Roles": [ { "Ref": "InterviewSQSRole" } ]
             }
          }
-    }
+    },
+    "Outputs":{
+      "InterviewSQSInstanceProfileOutput":{
+          "Description":"The Interview sqs instance profile required to run the aws cli from the ec2 instance",
+          "Value": {"Ref" : "InterviewInstanceProfile"},
+          "Export": {"Name":"InterviewSQSInstanceProfileOutput", "Id":{"Ref" : "InterviewInstanceProfile"}}
+
+      }
+  }
 }
